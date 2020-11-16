@@ -1,0 +1,562 @@
+Name-Manish Kumar Gupta
+Data Science and Business Analytics Internship
+The Sparks Foundation # 'GRIPNOV20'
+Task 3:(a)Performing ‘Exploratory Data Analysis’ on dataset ‘SampleSuperstore’
+(b)As a business manager, trying to find out the weak areas where you can work to make more profit.
+(c)What all business problems we can derive by exploring the data?
+#importing Important Library#
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import seaborn as sns
+import warnings
+warnings.filterwarnings('ignore')
+import matplotlib.pyplot as plt
+sample=pd.read_csv("D:SampleSuperstore.csv")
+sample.head()
+Ship Mode	Segment	Country	City	State	Postal Code	Region	Category	Sub-Category	Sales	Quantity	Discount	Profit
+0	Second Class	Consumer	United States	Henderson	Kentucky	42420	South	Furniture	Bookcases	261.9600	2	0.00	41.9136
+1	Second Class	Consumer	United States	Henderson	Kentucky	42420	South	Furniture	Chairs	731.9400	3	0.00	219.5820
+2	Second Class	Corporate	United States	Los Angeles	California	90036	West	Office Supplies	Labels	14.6200	2	0.00	6.8714
+3	Standard Class	Consumer	United States	Fort Lauderdale	Florida	33311	South	Furniture	Tables	957.5775	5	0.45	-383.0310
+4	Standard Class	Consumer	United States	Fort Lauderdale	Florida	33311	South	Office Supplies	Storage	22.3680	2	0.20	2.5164
+sample.shape
+(9994, 13)
+sample.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 9994 entries, 0 to 9993
+Data columns (total 13 columns):
+ #   Column        Non-Null Count  Dtype  
+---  ------        --------------  -----  
+ 0   Ship Mode     9994 non-null   object 
+ 1   Segment       9994 non-null   object 
+ 2   Country       9994 non-null   object 
+ 3   City          9994 non-null   object 
+ 4   State         9994 non-null   object 
+ 5   Postal Code   9994 non-null   int64  
+ 6   Region        9994 non-null   object 
+ 7   Category      9994 non-null   object 
+ 8   Sub-Category  9994 non-null   object 
+ 9   Sales         9994 non-null   float64
+ 10  Quantity      9994 non-null   int64  
+ 11  Discount      9994 non-null   float64
+ 12  Profit        9994 non-null   float64
+dtypes: float64(3), int64(2), object(8)
+memory usage: 1015.1+ KB
+sample.describe()
+Postal Code	Sales	Quantity	Discount	Profit
+count	9994.000000	9994.000000	9994.000000	9994.000000	9994.000000
+mean	55190.379428	229.858001	3.789574	0.156203	28.656896
+std	32063.693350	623.245101	2.225110	0.206452	234.260108
+min	1040.000000	0.444000	1.000000	0.000000	-6599.978000
+25%	23223.000000	17.280000	2.000000	0.000000	1.728750
+50%	56430.500000	54.490000	3.000000	0.200000	8.666500
+75%	90008.000000	209.940000	5.000000	0.200000	29.364000
+max	99301.000000	22638.480000	14.000000	0.800000	8399.976000
+Checking the duplication in dataset
+sample.duplicated().sum()
+17
+#removing the duplicate values from the data set
+sample.drop_duplicates(inplace = True)
+sample.head()
+Ship Mode	Segment	Country	City	State	Postal Code	Region	Category	Sub-Category	Sales	Quantity	Discount	Profit
+0	Second Class	Consumer	United States	Henderson	Kentucky	42420	South	Furniture	Bookcases	261.9600	2	0.00	41.9136
+1	Second Class	Consumer	United States	Henderson	Kentucky	42420	South	Furniture	Chairs	731.9400	3	0.00	219.5820
+2	Second Class	Corporate	United States	Los Angeles	California	90036	West	Office Supplies	Labels	14.6200	2	0.00	6.8714
+3	Standard Class	Consumer	United States	Fort Lauderdale	Florida	33311	South	Furniture	Tables	957.5775	5	0.45	-383.0310
+4	Standard Class	Consumer	United States	Fort Lauderdale	Florida	33311	South	Office Supplies	Storage	22.3680	2	0.20	2.5164
+sample.nunique()
+Ship Mode          4
+Segment            3
+Country            1
+City             531
+State             49
+Postal Code      631
+Region             4
+Category           3
+Sub-Category      17
+Sales           5825
+Quantity          14
+Discount          12
+Profit          7287
+dtype: int64
+#Checking if there is any missing data
+sample.isnull().sum()#there is no missing data
+Ship Mode       0
+Segment         0
+Country         0
+City            0
+State           0
+Postal Code     0
+Region          0
+Category        0
+Sub-Category    0
+Sales           0
+Quantity        0
+Discount        0
+Profit          0
+dtype: int64
+col=['Postal Code']
+sample1=sample.drop(columns=col,axis=1)                  #Removing unneccessary columns from the data set
+sample1.head() # new dataset
+Ship Mode	Segment	Country	City	State	Region	Category	Sub-Category	Sales	Quantity	Discount	Profit
+0	Second Class	Consumer	United States	Henderson	Kentucky	South	Furniture	Bookcases	261.9600	2	0.00	41.9136
+1	Second Class	Consumer	United States	Henderson	Kentucky	South	Furniture	Chairs	731.9400	3	0.00	219.5820
+2	Second Class	Corporate	United States	Los Angeles	California	West	Office Supplies	Labels	14.6200	2	0.00	6.8714
+3	Standard Class	Consumer	United States	Fort Lauderdale	Florida	South	Furniture	Tables	957.5775	5	0.45	-383.0310
+4	Standard Class	Consumer	United States	Fort Lauderdale	Florida	South	Office Supplies	Storage	22.3680	2	0.20	2.5164
+#calculating correlation between the numerical variables
+sample1.corr()
+Sales	Quantity	Discount	Profit
+Sales	1.000000	0.200722	-0.028311	0.479067
+Quantity	0.200722	1.000000	0.008678	0.066211
+Discount	-0.028311	0.008678	1.000000	-0.219662
+Profit	0.479067	0.066211	-0.219662	1.000000
+# Covariance of columns
+sample1.cov()
+Sales	Quantity	Discount	Profit
+Sales	389028.396022	278.765576	-3.645637	70057.067126
+Quantity	278.765576	4.958001	0.003990	34.565743
+Discount	-3.645637	0.003990	0.042624	-10.632751
+Profit	70057.067126	34.565743	-10.632751	54970.478824
+#there is no  strong correlation in any of them.
+Expolatory Data Analysis:# DATA VISUALIZATION
+plt.figure(figsize=(16,8))
+plt.bar('Sub-Category','Category', data=sample1)
+plt.title('Category vs Sub Category')
+plt.xlabel('Sub-Catgory')
+plt.ylabel('Category')
+plt.xticks(rotation=45)
+plt.show()
+
+observation: phone,Accessories Machine,Copeirs are at higher rate in subcategory.
+
+sample1.hist(bins=50 ,figsize=(20,15))
+plt.show();
+
+# Count the total repeatable states
+sample1['State'].value_counts()
+California              1996
+New York                1127
+Texas                    983
+Pennsylvania             586
+Washington               502
+Illinois                 491
+Ohio                     468
+Florida                  383
+Michigan                 254
+North Carolina           249
+Arizona                  224
+Virginia                 224
+Georgia                  184
+Tennessee                183
+Colorado                 182
+Indiana                  149
+Kentucky                 139
+Massachusetts            135
+New Jersey               130
+Oregon                   123
+Wisconsin                110
+Maryland                 105
+Delaware                  96
+Minnesota                 89
+Connecticut               82
+Missouri                  66
+Oklahoma                  66
+Alabama                   61
+Arkansas                  60
+Rhode Island              56
+Utah                      53
+Mississippi               53
+Louisiana                 42
+South Carolina            42
+Nevada                    39
+Nebraska                  38
+New Mexico                37
+Iowa                      30
+New Hampshire             27
+Kansas                    24
+Idaho                     21
+Montana                   15
+South Dakota              12
+Vermont                   11
+District of Columbia      10
+Maine                      8
+North Dakota               7
+West Virginia              4
+Wyoming                    1
+Name: State, dtype: int64
+sample1['City'].value_counts()
+New York City     914
+Los Angeles       746
+Philadelphia      536
+San Francisco     506
+Seattle           424
+                 ... 
+Redding             1
+Citrus Heights      1
+Kissimmee           1
+Grand Island        1
+Baytown             1
+Name: City, Length: 531, dtype: int64
+plt.figure(figsize=(15,15))
+sns.countplot(x=sample1['State'])
+plt.xticks(rotation=90)
+plt.title("STATE")
+plt.show()
+​
+
+data_sample1=sample1.select_dtypes(include=[np.number])
+# Analysing using BoxPlot 
+​
+plt.figure(figsize=[16,10])
+sns.set(style="whitegrid")
+sns.boxplot(x="variable", y="value", data=pd.melt(data_sample1), width=1)
+​
+plt.show()
+
+# from above it is clear that Sales and profit are showing outliers.
+from plotly import __version__
+import cufflinks as cf
+from plotly.offline import download_plotlyjs,init_notebook_mode,plot, iplot
+init_notebook_mode(connected=True)
+​
+cf.go_offline
+<function cufflinks.offline.go_offline(connected=None)>
+#Removal of Outliers
+def remove_outlier(dataset,k=4):
+    for col in dataset.columns:
+            if (dataset[col].dtype=="int64" or dataset[col].dtype=="float64"):
+                mean = dataset[col].mean()
+                global sample1     
+                std = dataset[col].std()    
+                outlier = [i for i in dataset[col] if (i < mean - k * std)]
+                outlier = [i for i in outlier if (i > mean + k * std)]       
+                sample1 = dataset.loc[dataset[col].isin(outlier)]
+data_sample1=sample1.select_dtypes(include=[np.number])
+data_sample1.plot(kind='box')
+<matplotlib.axes._subplots.AxesSubplot at 0x1dcb6e060c8>
+
+category wise sales in each region
+plt.figure(figsize=[12,8])
+ax = sns.barplot(x="Region", y="Sales", hue="Category", data=sample1, palette="Blues")
+
+observation: maximum sales is done from technology followed by furnitures.
+#counting ship mode segment wise
+
+sns.catplot("Ship Mode", hue="Segment", data=sample1, kind="count", aspect=1, palette="Set1")
+<seaborn.axisgrid.FacetGrid at 0x1dcb72e60c8>
+
+#obseravtion: Standard class is highly prefered from all ship mode.
+
+#Segment wise sales in Each region
+plt.figure(figsize=[12,8])
+ax = sns.barplot(x="Region", y="Sales", hue="Segment", data=sample1, palette="RdBu")
+
+#observation:maximum sales is from Home office followed by consumer.
+
+#moving on analysis of data using stastistic.
+
+grouped= sample1.groupby("City")
+grouped
+<pandas.core.groupby.generic.DataFrameGroupBy object at 0x000001DCB869A188>
+agg_sales=grouped['Sales'].agg(np.sum).sort_values(ascending=False).reset_index() # aggregated sales per city
+agg_sales.head()
+City	Sales
+0	New York City	256319.041
+1	Los Angeles	175831.901
+2	Seattle	119460.282
+3	San Francisco	112577.172
+4	Philadelphia	109061.461
+#observation:New york city has most sales followed by Los angles ,Seattle and San francisco.
+
+agg_profit=grouped['Profit'].agg(np.sum).sort_values(ascending=False).reset_index() # aggegrated profit per city
+agg_profit.head()
+City	Profit
+0	New York City	62013.8973
+1	Los Angeles	30431.4267
+2	Seattle	29121.6825
+3	San Francisco	17466.1186
+4	Detroit	13146.6935
+#observation:New york city has most profit followed by Los angles ,Seattle and San francisco.
+
+agg_discount=grouped['Discount'].agg(np.sum).sort_values(ascending=False).reset_index() #aggregated discount per city
+agg_discount.head()
+City	Discount
+0	Philadelphia	175.30
+1	Houston	142.74
+2	Chicago	119.70
+3	Dallas	56.30
+4	Los Angeles	55.50
+#observation: Maximum Discount is given by Philadelphia followed by Houston,chicago.
+
+avg_sales=grouped['Sales'].agg(np.mean).sort_values(ascending=False).reset_index() #average sales per city
+avg_sales.head()
+City	Sales
+0	Jamestown	2354.395000
+1	Cheyenne	1603.136000
+2	Bellingham	1263.413333
+3	Independence	1208.685000
+4	Burbank	1082.386000
+#observation: maximum average sales is from Jamestown followed by Cheyenne,Bellingham .
+
+#Cities with lowest Average sales
+avg_sales.tail()
+City	Sales
+526	Ormond Beach	2.808
+527	Pensacola	2.214
+528	Jupiter	2.064
+529	Elyria	1.824
+530	Abilene	1.392
+avg_profit=grouped['Profit'].agg(np.mean).sort_values(ascending=False).reset_index() #average profit per city
+avg_profit.head()
+City	Profit
+0	Jamestown	642.885750
+1	Independence	487.831500
+2	Lafayette	323.173794
+3	Minneapolis	296.721070
+4	Appleton	277.383150
+#observation: maximum average profit is also obtained by Jamestown followed by Independence.
+
+#Cities with lowest Average profit
+avg_profit.tail()
+City	Profit
+526	Lancaster	-157.371052
+527	Round Rock	-169.061614
+528	Oswego	-178.709200
+529	Champaign	-182.352000
+530	Bethlehem	-200.619160
+avg_dist=grouped['Discount'].agg(np.mean).sort_values(ascending=False).reset_index() # average discount per city
+avg_dist.head()
+City	Discount
+0	Deer Park	0.8
+1	Abilene	0.8
+2	Missouri City	0.8
+3	Romeoville	0.8
+4	Littleton	0.7
+avg_dist.tail() # city with lowest average discount
+City	Discount
+526	Kenner	0.0
+527	Jonesboro	0.0
+528	Jefferson City	0.0
+529	Jamestown	0.0
+530	Aberdeen	0.0
+#observation: city like Kenner,Jonesboro,Jefferson City,Jamestown,Aberdeen gives zero discount.
+
+#Cities having High Average Discounts
+high_dist=avg_dist[avg_dist['Discount'] >=0.6]
+​
+#Cities having low Average Discounts
+low_dist=avg_dist[avg_dist['Discount']==0]
+​
+​
+#Cities having High Average Sales
+high_sales=avg_sales[avg_sales['Sales']>400]
+​
+#Cities having low Average Sales
+low_sales=avg_sales[avg_sales['Sales']<40]
+​
+​
+#Cities having High Average Profit
+high_profit=avg_profit[avg_profit['Profit']>100]
+​
+#Cities having low Average profit
+low_profit=avg_profit[avg_profit['Profit']<0]
+​
+#Cities with High-Average-Discounts but Low-Average-Sales
+merged= pd.merge(high_dist,low_sales, on=['City'],how='inner')
+merged
+City	Discount	Sales
+0	Deer Park	0.8	6.924
+1	Abilene	0.8	1.392
+2	Missouri City	0.8	6.370
+3	Romeoville	0.8	8.952
+4	Pensacola	0.7	2.214
+5	Elyria	0.7	1.824
+6	Ormond Beach	0.7	2.808
+7	Tinley Park	0.6	22.288
+#insights1: The above 8 cities though gives high discount but their sales are very low .So it is not profitable to give more discount further .better is not to invest any more in these city.
+
+#Cities with high Average Sales as well as Average Profit
+merged2= pd.merge(high_sales,high_profit, on=['City'], how='inner')
+merged2.head()
+City	Sales	Profit
+0	Jamestown	2354.395000	642.885750
+1	Cheyenne	1603.136000	100.196000
+2	Bellingham	1263.413333	203.530267
+3	Independence	1208.685000	487.831500
+4	Burbank	1082.386000	254.844600
+#Insights 2:Basically above city are hotspot from business point of view in terms of all aspects i.s sales,profit. so doing business at theses places will be more profitable.
+
+#Cities where Average Discount is less but Average Sales is High
+merged3= pd.merge(low_dist,high_sales, on='City', how='inner')
+merged3
+City	Discount	Sales
+0	Dubuque	0.0	562.433333
+1	Beverly	0.0	861.063333
+2	Appleton	0.0	835.655000
+3	Saint Peters	0.0	697.160000
+4	Norman	0.0	675.665000
+5	Noblesville	0.0	772.795000
+6	Morristown	0.0	719.014286
+7	Minneapolis	0.0	733.501739
+8	Harrisonburg	0.0	626.958571
+9	Independence	0.0	1208.685000
+10	Madison	0.0	534.679000
+11	Lafayette	0.0	807.619355
+12	Jamestown	0.0	2354.395000
+#insight3: above 10 city makes maximum sales with zero discount so increasing more investment or discount may increase profitability.
+
+​
+#Cities with high Average sales but low Average profit
+merged4= pd.merge(high_sales,low_profit, on='City', how='inner')
+merged4
+City	Sales	Profit
+0	Burlington	866.723280	-144.915088
+1	Round Rock	693.436114	-169.061614
+2	Richardson	644.232000	-12.244650
+fig, ax = plt.subplots(figsize = (10 , 6))
+ax.scatter(sample1["Sales"] , sample1["Profit"])
+ax.set_xlabel('Sales')
+ax.set_ylabel('Profit')
+ax.set_title('Sales vs Profit')
+plt.show()
+
+#insight4: the above city though have more sales but they are loosing i.e no profit so better not to more investment
+or shift business to other city and must found reason for losses.
+
+​
+#Cities with high Average discount but low Average profit
+merged5= pd.merge(high_dist,low_profit, on='City', how='inner')
+merged5
+City	Discount	Profit
+0	Deer Park	0.8	-10.3860
+1	Abilene	0.8	-3.7584
+2	Missouri City	0.8	-9.5550
+3	Romeoville	0.8	-14.7708
+4	Littleton	0.7	-98.8018
+5	Pensacola	0.7	-1.4760
+6	Elyria	0.7	-1.3984
+7	Ormond Beach	0.7	-1.9656
+# insight 5: The above 8 city incured losses though gives maximum discount.
+#so this place is not suitable for the more business investment.
+#Cities with low Average discount but High Average profit
+merged6= pd.merge(low_dist, high_profit, on='City', how='inner')
+merged6
+City	Discount	Profit
+0	Vacaville	0.0	110.052800
+1	Dubuque	0.0	159.224800
+2	Broken Arrow	0.0	115.104520
+3	Beverly	0.0	218.306467
+4	Atlanta	0.0	179.324690
+5	Appleton	0.0	277.383150
+6	Virginia Beach	0.0	126.555231
+7	Warwick	0.0	212.759120
+8	Washington	0.0	105.958930
+9	Saint Peters	0.0	146.403600
+10	Norman	0.0	134.764350
+11	Muskogee	0.0	110.649150
+12	Morristown	0.0	262.603871
+13	Mobile	0.0	197.802655
+14	Minneapolis	0.0	296.721070
+15	Saint Cloud	0.0	156.538000
+16	Roswell	0.0	134.857517
+17	Edmond	0.0	121.551950
+18	Indianapolis	0.0	119.202339
+19	Harrisonburg	0.0	127.074843
+20	Greenwood	0.0	117.933050
+21	Florence	0.0	103.284100
+22	Independence	0.0	487.831500
+23	Madison	0.0	112.365520
+24	Lafayette	0.0	323.173794
+25	Kenosha	0.0	114.230311
+26	Jamestown	0.0	642.885750
+#insight 6: the above 27 city though gives zero discount but obtain high amount of profit.so best suited city for business.
+
+#State wise profit
+plt.figure(figsize=[24,15])
+ax = sns.barplot(x="State", y="Profit", data=sample1, palette="Set1",)
+plt.xticks(rotation=90, fontsize=16)
+plt.yticks(fontsize=15)
+plt.title("States VS Profit",fontsize=24)
+plt.xlabel("States",fontsize=20)
+plt.ylabel("Profit",fontsize=20)
+plt.tight_layout()
+
+#observation:The above plot clearly shows, 'District of Columbia', 'Vermont','Wyoming' states are generating highest profits. And States like 'Texas', 'Pennsylvania','Illinois','Arizona','Oregon','Colorado','Ohio' are generating losses. Hence focus has to be given in such States.
+
+#Category Wise profit in the whole country
+plt.figure(figsize=[12,8])
+ax = sns.barplot(x="Category", y="Profit", data=sample1, palette="Set2")
+
+#Category wise Profit in Each Region
+plt.figure(figsize=[12,8])
+ax = sns.barplot(x="Region", y="Profit", hue="Category", data=sample1, palette="Set2")
+
+#observation: Maximum profit is gained from Technology a category part.so lets explore more on it.
+
+#Subcategory wise profit
+plt.figure(figsize=[14,10])
+ax = sns.barplot(x="Sub-Category", y="Profit", data=sample1, palette="magma")
+plt.xlabel("Subcategory", fontsize=15)
+plt.ylabel("Profit",fontsize=15)
+plt.xticks(rotation=90)
+plt.show()
+
+#observation: from above visualization it is clear that Tables and Bookcases are moving down instead of profit so useful measures should be taken to improve it.Copiers is doing best and Accesories ,phones are doing good.
+
+data=sample1[(sample1['Category']=="Technology")] ##Entries with Category=Technology
+data
+Ship Mode	Segment	Country	City	State	Region	Category	Sub-Category	Sales	Quantity	Discount	Profit
+7	Standard Class	Consumer	United States	Los Angeles	California	West	Technology	Phones	907.152	6	0.2	90.7152
+11	Standard Class	Consumer	United States	Los Angeles	California	West	Technology	Phones	911.424	4	0.2	68.3568
+19	Second Class	Consumer	United States	San Francisco	California	West	Technology	Phones	213.480	3	0.2	16.0110
+26	Second Class	Consumer	United States	Los Angeles	California	West	Technology	Accessories	90.570	3	0.0	11.7741
+35	First Class	Corporate	United States	Richardson	Texas	Central	Technology	Phones	1097.544	7	0.2	123.4737
+...	...	...	...	...	...	...	...	...	...	...	...	...
+9983	Standard Class	Consumer	United States	Grand Rapids	Michigan	Central	Technology	Phones	97.980	2	0.0	27.4344
+9986	Standard Class	Consumer	United States	Los Angeles	California	West	Technology	Accessories	36.240	1	0.0	15.2208
+9987	Standard Class	Corporate	United States	Athens	Georgia	South	Technology	Accessories	79.990	1	0.0	28.7964
+9988	Standard Class	Corporate	United States	Athens	Georgia	South	Technology	Phones	206.100	5	0.0	55.6470
+9991	Standard Class	Consumer	United States	Costa Mesa	California	West	Technology	Phones	258.576	2	0.2	19.3932
+1847 rows × 12 columns
+
+finding all the sales under technology
+plt.figure(figsize=[14,10])
+ax = sns.barplot(x="Sub-Category", y="Sales", data=data, palette="Blues")
+plt.xlabel("Subcategories",fontsize=15)
+plt.ylabel("Sales",fontsize=15)
+Text(0, 0.5, 'Sales')
+
+observation: above plot clearly explain that maximum sales from technology is obtained from copiers followed by machines and least by Accessories.Accessories must be taken in account to improve it.
+
+finding profit incured from each sub-category under technology
+plt.figure(figsize=[14,10])
+ax = sns.barplot(x="Sub-Category", y="Profit", data=data, palette="Reds")
+plt.xlabel("Subcategories",fontsize=15)
+plt.ylabel("Profit",fontsize=15)
+Text(0, 0.5, 'Profit')
+
+observation: maximum profit is obtained from copiers and also it has maximum sales Though Machine is having maximum sales but profit obtained fom it is least among all while from Accessories profit is comparatively batter though its sales is least but to enhance more profit most focus be done on Accessories.
+
+finding the Profit of each Subcategory under Technology for each Region
+plt.figure(figsize=[12,8])
+ax = sns.barplot(x="Sub-Category", y="Profit",hue="Region", data=data, palette="RdBu")
+plt.xlabel("Subcategories",fontsize=15)
+plt.ylabel("Profit",fontsize=15)
+Text(0, 0.5, 'Profit')
+
+Observation:Maximum profit from Copiers is obtained from Centrak region followed by west and east. but in machine it is from east and in phone and accessores almost all are equivalent.
+
+finding Profit of each Subcategory as per the Ship-mode
+plt.figure(figsize=[12,8])
+ax = sns.barplot(x="Sub-Category", y="Profit",hue="Ship Mode", data=data, palette="RdBu")
+plt.xlabel("Subcategories",fontsize=15)
+plt.ylabel("Profit",fontsize=15)
+Text(0, 0.5, 'Profit')
+
+observation: IN case of Copiers maximum profit is obtained from First class followed by standard class and in Accessories from same day while in phone almost all are equivalent and in machine it is from second class ship mode.
+
+Conclusion:
+From the Above data Visualization we can see that in Which states and in which Category Sales and profits are High or less,We can improve in that States By Providing Discounts in prefered Range so that Company and consumer both will be in profit.So For Deciding that Range we have to do some Technical Analysis. One can Do it through Factor Analysis,or also can Do it throgh neural networks. One thing to be noted is that while the superstore is incurring losses due to giving discounts on its products, they can't stop giving discounts of their products. Most of the heavy discounts are during festivals, end-of-season and clearance sales which are necessary so that the store can make space in their warehouses for fresh stock. Also, by incurring small losses, the company gains in the future by attracting more long term customers. Therefore, the small losses from discounts are an essential part of company's business.
+
+​
